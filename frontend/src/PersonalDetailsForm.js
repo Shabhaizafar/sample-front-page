@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Calendar, User, MapPin, Weight, Star, Clock } from 'lucide-react';
+import axios from 'axios';
 
 const PersonalDetailsForm = () => {
   const [formData, setFormData] = useState({
@@ -156,12 +157,25 @@ const PersonalDetailsForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (validateForm() && !showAgeRedirect) {
-      console.log('Form submitted:', formData);
-      alert('Form submitted successfully!');
+  const handleSubmit = async () => {
+  if (validateForm() && !showAgeRedirect) {
+    try {
+      const response = await axios.post("http://localhost:5000/api/personal-details", formData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.data.success) {
+        alert("Form submitted successfully!");
+        console.log("Saved Data:", response.data.data);
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error.response?.data || error.message);
+      alert(error.response?.data?.message || "Something went wrong");
     }
-  };
+  }
+};
 
   const generateYearOptions = () => {
     const currentYear = new Date().getFullYear();
